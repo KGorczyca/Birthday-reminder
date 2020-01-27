@@ -3,8 +3,6 @@
 
 
 import os, json, openpyxl, datetime, smtplib, locale
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 
 
 today = datetime.date.today()
@@ -79,7 +77,6 @@ def SendInfo(user,password, From, To, Subject, Body):  #wysłanie wiadomości em
 
             
 print(create_sheet('date_file.txt','f.xlsx','FILE.xlsx'))
-print(who_celebrate_today('f.xlsx','FILE.xlsx'))
 war = who_celebrate_today('f.xlsx','FILE.xlsx')  #przypisanie funkcji do zmiennej
 if war != False:                                 #stworzenie waruknu: jeżeli funkcja zwraca wartość różną od False wysłany zostaje mail z powiadomieniem o urodzinach
     print(SendInfo('fikcyjnekontodozadan@gmail.com', '12345678KG','Kasia','fikcyjnekontodozadan@gmail.com', 'Birthday',who_celebrate_today('f.xlsx','FILE.xlsx') ))
