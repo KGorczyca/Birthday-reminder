@@ -2,7 +2,7 @@
 #! python3
 
 
-import os, json, openpyxl, datetime, smtplib, locale
+import os, json, openpyxl, datetime, smtplib
 
 
 today = datetime.date.today()
