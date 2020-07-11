@@ -1,90 +1,121 @@
-# -*- encoding: utf-8 -*-
+#-*- encoding: utf-8 -*-
 #! python3
 
 
-import os, json, openpyxl, datetime, smtplib
+import os, datetime, smtplib
+import csv
 
 
 today = datetime.date.today()
 today = today.strftime('%d.%m.%Y')  #konwersja obiektu datetime na ciąg tekstowy
 
 
+class Birthday:
 
 
+    date_of_birth = []
 
-def create_sheet(path, title_sheet, file_name_xlsx):    #utworzenie arkusza programu excel na podstawie utworzonego wczesniej pliku tekstowego z datami urodzin
-    date_file = open(path,'r')
-    file_with_date = date_file.readlines()
-    wb = openpyxl.Workbook()
-    sheet = wb.active
-    sheet.title = title_sheet
+    def __init__(self, name, surname,birth_date):
+
+        
+        self.name = name
+        self.surname = surname
+        self.birth_date = birth_date
+        self.date_of_birth.append(self)
+
+    def create_file(self, path):
+
+        self.path = path
+
+        if os.path.isfile(self.path):
+            with open(self.path, 'w+') as file:
+                file.writelines([self.name,',', self.surname,',',self.birth_date,'\n'])
+                
+    @staticmethod
+    def open_file(path):
+
+        with open (path,"r") as f:
+            reader = csv.reader(f)
+            reader = list(reader)
+            celebrate_list = []
+            for i in range(len(reader)):
+                date_of_birth = reader[i][2]
+                if date_of_birth[0:5] == today[0:5]:
+                    celebrate_list.append(reader[i])
+                    
+                    
+        return celebrate_list
+
+        
     
-    list_with_date = []
-    for elem in range (1, (len(file_with_date)+1)):  #iteracja po pliku tekstowym z datami 
-        x = file_with_date[elem-1].split(' ')        #stworzenie zmiennej x zawierającej listę z imieniem, nazwiskiem oraz datą urodzin
-        list_with_date.append(x)
-   
-    numRow=1
-    for date in list_with_date:                      #iteracja przez zagnieżdżoną listę z danymi w celu stworzenia arkusza kalkulacyjnego
-        for i in range (1, int((len(date))+1)):
-            sheet.cell(row= numRow, column = i).value = date[i-1]
-            sheet.column_dimensions['A'].width = 20
-            sheet.column_dimensions['B'].width = 20
-            sheet.column_dimensions['C'].width = 20
+class Message:
 
-        numRow+=1
+    def __init__(self, user, password, From, To, Subject, Body):
+        
+        self.user = user
+        self.password = password
+        self.From = From
+        self.To = To
+        self.Subject = Subject
+        self.Body = Body
+        
 
-    wb.save(file_name_xlsx)
-
-    return(f'A new sheet  {title_sheet} has been created in {file_name_xlsx}')
+    def Send_Info(self):
 
 
+        message = f'From: {self.From} Subject: {self.Subject} \n{self.Body}'
+        server = smtplib.SMTP_SSL('smtp.gmail.com')
+        server.ehlo()
+        server.login(self.user,self.password)
+        server.sendmail(self.user,self.To, message)
+        server.close()
+        print('Mail sent')
+        return True
+        print('error sending email')
+        return False
 
-
-def who_celebrate_today(title_sheet, file_name_xlsx):  
-
-    wb = openpyxl.load_workbook(file_name_xlsx)
-    sheet = wb[title_sheet]
-    i= sheet.max_row
-    celebrate_list = []
-    for j in range(1, i+1):
-
-    
-        birth = str(sheet.cell(row=j, column = 3).value)  #stworzenie zmiennej birth, zawierającej datę urodzenia
-        if birth[0:5] == today[0:5]:  #porównanie dnia i miesiąca urodzenia z dzisiejszą datą
-            sentence = f'Today is  {int(today[6:10])-int(birth[6:10])} birthaday {sheet.cell(row=j, column = 1).value} {sheet.cell(row=j, column = 2).value}'.encode('utf-8').decode('ascii','ignore')
-            celebrate_list.append(sentence)
-
-            
-    return celebrate_list
-    
-    
-    
-
-def SendInfo(user,password, From, To, Subject, Body):  #wysłanie wiadomości email z powiadomieniem o urodzinach
-
-    message = f'From: {From} Subject: {Subject} \n{Body}'
-    server = smtplib.SMTP_SSL('smtp.gmail.com')
-    server.ehlo()
-    server.login(user,password)
-    server.sendmail(user,To, message)
-    server.close()
-    print('Mail sent')
-    return True
-    print('error sending email')
-    return False
+        
   
-
-            
-print(create_sheet('date_file.txt','f.xlsx','FILE.xlsx'))
-war = who_celebrate_today('f.xlsx','FILE.xlsx')  #przypisanie funkcji do zmiennej
-if war != False:                                 #stworzenie waruknu: jeżeli funkcja zwraca wartość różną od False wysłany zostaje mail z powiadomieniem o urodzinach
-    print(SendInfo('fikcyjnekontodozadan@gmail.com', '12345678KG','Kasia','fikcyjnekontodozadan@gmail.com', 'Birthday',who_celebrate_today('f.xlsx','FILE.xlsx') ))
-
+                    
+person1 = Birthday('Katarzyna','Kowalska','11.07.1986')
+person2 = Birthday('Jagoda','Kowalska','12.07.1995')
+person3 = Birthday('Anna','Kowalska','11.07.1988')
+persons = [person1, person2, person3]
 
 
+adding = [person.create_file('C:/Users/HP/Desktop/projekty/FirstProject/date_file.csv') for person in persons]
+
+#print(Birthday.open_file('C:/Users/HP/Desktop/projekty/FirstProject/date_file.csv'))
 
 
-            
-            
-    
+
+message = Message('fikcyjnekontodozadan@gmail.com', '12345678KG','Kasia','fikcyjnekontodozadan@gmail.com', 'Birthday','Today is birthday of {}'.format(Birthday.open_file('C:/Users/HP/Desktop/projekty/FirstProject/date_file.csv'))) 
+#print(message.Send_Info())
+
+
+
+if Birthday.open_file('C:/Users/HP/Desktop/projekty/FirstProject/date_file.csv'):
+    print(message.Send_Info())
+else:
+    print('Nobody has birthday today')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
