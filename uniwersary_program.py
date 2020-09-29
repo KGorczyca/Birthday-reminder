@@ -27,9 +27,8 @@ class Birthday:
 
         self.path = path
 
-        if os.path.isfile(self.path):
-            with open(self.path, 'w+') as file:
-                file.writelines([self.name,',', self.surname,',',self.birth_date,'\n'])
+        with open(self.path, 'a') as file:
+            file.writelines([self.name,',', self.surname,',',self.birth_date,'\n'])
                 
     @staticmethod
     def open_file(path):
