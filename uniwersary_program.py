@@ -30,6 +30,7 @@ class Birthday:
 
         self.path = path
 
+<<<<<<< HEAD
         with open(self.path, 'w+', newline='') as csvfile:
             csv_writer = csv.writer(csvfile, delimiter=',',quotechar='|',quoting=csv.QUOTE_MINIMAL)
             csv_writer.writerow([self.name, self.surname,self.birth_date])
@@ -37,6 +38,11 @@ class Birthday:
 
 
         
+=======
+        with open(self.path, 'a') as file:
+            file.writelines([self.name,',', self.surname,',',self.birth_date,'\n'])
+                
+>>>>>>> fe8e27eeb5af00f90c680fef92d26b6835e2ed68
     @staticmethod
     def open_file(path):
 
